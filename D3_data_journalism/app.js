@@ -32,6 +32,8 @@ d3.csv("data.csv").then(function(npData){
     npData.forEach(function(data){
       data.poverty = +data.poverty
       data.healthcare = +data.healthcare
+      data.abbr = data.abbr
+      data.state = data.state
       // console.log(data.health)
       // console.log(data.poverty)
 
@@ -73,7 +75,6 @@ var drawLine = d3.line()
 // // append path for lines
 chartGroup.append("path")
 .attr("d", (drawLine(npData)));
-// .classed("line", true));
 
 
 // Create circles to plot
@@ -83,8 +84,25 @@ circlesGroup = chartGroup.selectAll("circle")
 .append("circle")
 .attr("cx", (d,i) => xScalePoverty(d.poverty))
 .attr("cy", d => yScaleHealthCare(d.healthcare))
-.attr("fill", "blue")
-.attr("r", "15");
+.attr("r", "15")
+.classed("stateCircle", true);
+
+// Create State Abbreviations
+chartGroup.selectAll("text")
+.data(npData)
+.enter()
+.append("text")
+.attr("x", (d,i) => xScalePoverty(d.poverty))
+.attr("y", d => yScaleHealthCare(d.healthcare-.30))
+.classed("stateText", true)
+.text(d => d.abbr)
+.on("mouseover", function(d) {
+  toolTip.show(d);
+})
+.on("mouseout", function(d,i) {
+  toolTip.hide(d);
+});
+
 
 // Create x Axis titles
 chartGroup.append("text")
@@ -108,10 +126,10 @@ chartGroup.append("text")
 
 // Create Tooltip
 var toolTip = d3.tip()
-.attr("class", "tooltip")
-.offset([80, -60])
+.attr("class", "d3-tip")
+.offset([-8, 0])
 .html(function(d){
-  return(`${d.abbr} <hr> Healthcare (%) ${d.healthcare} <hr> Poverty ${d.poverty}`)
+  return(`${d.state} <hr> Healthcare (%) ${d.healthcare} <hr> Poverty ${d.poverty}`)
 });
 // create tooltip in chartGroup
 chartGroup.call(toolTip);
@@ -120,10 +138,10 @@ chartGroup.call(toolTip);
 
 circlesGroup.on("mouseover", function(d){
   toolTip.show(d, this);
-
 })
 .on("mouseout", function(d){
   toolTip.hide(d)
 });
+
 
 });
