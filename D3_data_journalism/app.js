@@ -50,7 +50,7 @@ var yScaleHealthCare = d3.scaleLinear()
 .range([chartHeight,0]);
 // ---------------------------------------------------------------
 // console.log(yScaleHealthCare);
-console.log(xScalePoverty);
+// console.log(xScalePoverty);
 // // Scales and axes
 var bottomAxis = d3.axisBottom(xScalePoverty)
 // // .tickFormat()
@@ -86,22 +86,44 @@ circlesGroup = chartGroup.selectAll("circle")
 .attr("fill", "blue")
 .attr("r", "15");
 
-var toolTip = d3.select("body")
-.append("div")
-.attr("class", "tooltip");
-// circlesGroup.call(toolTip)
+// Create x Axis titles
+chartGroup.append("text")
+.attr("transform", `translate(${chartWidth / 2},${chartHeight + margin.top -5})`)
+.attr("text-anchor", "middle")
+.attr("font-size", "16px")
+.attr("fill", "blue")
+.text("In Poverty(%)");
 
+// Create Y Axis
+chartGroup.append("text")
+.attr("transform", "rotate(-90)")
+.attr("x", 0-chartHeight/2)
+.attr("y", 22-margin.left)
+.attr("text-anchor", "middle")
+.attr("font-size", "16px")
+.attr("fill", "blue")
+.text("Lacks Healthcare(%)");
+
+
+
+// Create Tooltip
+var toolTip = d3.tip()
+.attr("class", "tooltip")
+.offset([80, -60])
+.html(function(d){
+  return(`${d.abbr} <hr> Healthcare (%) ${d.healthcare} <hr> Poverty ${d.poverty}`)
+});
+// create tooltip in chartGroup
+chartGroup.call(toolTip);
+
+// create Mouseover listeners
 
 circlesGroup.on("mouseover", function(d){
-  d3.select(this)
-  toolTip.style("display", "block");
-  toolTip.html(`${d.abbr} <hr> Healthcare (%) ${d.healthcare} <hr> Poverty ${d.poverty} `)
-  // .style("left", d3.event.pageX + "px")
-  // .style("top", d3.event.pageY + "px");
+  toolTip.show(d, this);
+
 })
-.on("mouseout", function(d,i){
-  d3.select(this)
-  toolTip.style("display", "none");
+.on("mouseout", function(d){
+  toolTip.hide(d)
 });
 
 });
